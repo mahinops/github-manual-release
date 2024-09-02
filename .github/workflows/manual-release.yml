@@ -10,6 +10,10 @@ on:
 jobs:
   create-tag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      deployments: write
+      
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
