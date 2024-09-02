@@ -43,12 +43,14 @@ runs:
   - name: Get Previous Tags
     id: previous_tag
     run: |
-      tags=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      tags=$(curl -s -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
         "https://api.github.com/repos/${{ github.repository }}/tags" \
         | jq -r '.[].name')
       previous_tag=$(echo "$tags" | sort -V | tail -n 2 | head -n 1)
       echo $previous_tag
       echo "PREVIOUS_TAG=$previous_tag" >> $GITHUB_ENV
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     shell: bash
 
   - name: Generate Release Notes
