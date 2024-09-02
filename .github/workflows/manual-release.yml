@@ -11,6 +11,9 @@ jobs:
   create-tag:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Generate Release Tag
         uses: ./
         with:
