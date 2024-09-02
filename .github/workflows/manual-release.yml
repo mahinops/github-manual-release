@@ -22,7 +22,6 @@ jobs:
         uses: ./
         with:
           release-tag-number: ${{ github.event.inputs.release-tag-number }}
-        env:
-          USER_EMAIL: ${{ secrets.USER_EMAIL }}
-          USER_NAME: ${{ secrets.USER_NAME }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          user-email: ${{ secrets.USER_EMAIL }}
+          user-name: ${{ secrets.USER_NAME }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

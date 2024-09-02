@@ -7,6 +7,15 @@ inputs:
     description: 'Enter the release-tag number'
     required: true
     default: 'v1.0.0'
+  user-email:
+    description: 'Email for Git configuration'
+    required: true
+  user-name:
+    description: 'Name for Git configuration'
+    required: true
+  github-token:
+    description: 'GitHub Token'
+    required: true
 
 runs:
   using: "composite"
@@ -24,11 +33,8 @@ runs:
 
   - name: Set Git Config
     run: |
-      git config --global user.email "${{ env.USER_EMAIL }}"
-      git config --global user.name "${{ env.USER_NAME }}"
-    env:
-      USER_EMAIL: ${{ secrets.USER_EMAIL }}
-      USER_NAME: ${{ secrets.USER_NAME }}
+      git config --global user.email "${{ inputs.user-email }}"
+      git config --global user.name "${{ inputs.user-name }}"
     shell: bash
 
   - name: Update Tag
@@ -37,20 +43,20 @@ runs:
       git tag -a ${{ inputs.release-tag-number }} -m "Updating tags"
       git push origin ${{ inputs.release-tag-number }}
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
     shell: bash
 
   - name: Get Previous Tags
     id: previous_tag
     run: |
-      tags=$(curl -s -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
+      tags=$(curl -s -H "Authorization: token ${{ inputs.github-token }}" \
         "https://api.github.com/repos/${{ github.repository }}/tags" \
         | jq -r '.[].name')
       previous_tag=$(echo "$tags" | sort -V | tail -n 2 | head -n 1)
       echo $previous_tag
       echo "PREVIOUS_TAG=$previous_tag" >> $GITHUB_ENV
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
     shell: bash
 
   - name: Generate Release Notes
@@ -65,7 +71,7 @@ runs:
         -f previous_tag_name=${{ env.PREVIOUS_TAG }} \
         | jq -r '.body' > releaseNote.md
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
     shell: bash
 
   - name: View Release Notes
@@ -77,5 +83,5 @@ runs:
     run: |
       gh release create ${{ inputs.release-tag-number }} -F releaseNote.md
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
     shell: bash
