@@ -20,11 +20,15 @@ runs:
         echo "Branch is not main, exiting."
         exit 1
       fi
+    shell: bash
 
   - name: Set Git Config
     run: |
-      git config --global user.email "${{ secrets.USER_EMAIL }}"
-      git config --global user.name "${{ secrets.USER_NAME }}"
+      git config --global user.email "${{ env.USER_EMAIL }}"
+      git config --global user.name "${{ env.USER_NAME }}"
+    env:
+      USER_EMAIL: ${{ secrets.USER_EMAIL }}
+      USER_NAME: ${{ secrets.USER_NAME }}
     shell: bash
 
   - name: Update Tag
@@ -34,6 +38,7 @@ runs:
       git push origin ${{ inputs.release-tag-number }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    shell: bash
 
   - name: Get Previous Tags
     id: previous_tag
@@ -44,6 +49,7 @@ runs:
       previous_tag=$(echo "$tags" | sort -V | tail -n 2 | head -n 1)
       echo $previous_tag
       echo "PREVIOUS_TAG=$previous_tag" >> $GITHUB_ENV
+    shell: bash
 
   - name: Generate Release Notes
     run: |
@@ -58,13 +64,16 @@ runs:
         | jq -r '.body' > releaseNote.md
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    shell: bash
 
   - name: View Release Notes
     run: |
       cat releaseNote.md
+    shell: bash
 
   - name: Create Release
     run: |
       gh release create ${{ inputs.release-tag-number }} -F releaseNote.md
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    shell: bash
