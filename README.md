@@ -61,7 +61,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate Release Tag
-        uses: mokhlesurr031/github-manual-release@v2.0.1
+        uses: mokhlesurr031/github-manual-release@v2.0.2
         with:
           release-tag-number: ${{ github.event.inputs.release-tag-number }}
           user-email: ${{ secrets.USER_EMAIL }}
